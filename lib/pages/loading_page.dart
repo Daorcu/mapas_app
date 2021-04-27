@@ -33,7 +33,6 @@ class _LoadingPageState extends State<LoadingPage> with WidgetsBindingObserver {
             context, navegarMapaFadeIn(context, MapaPage()));
       }
     }
-    print('=====> $state');
   }
 
   @override

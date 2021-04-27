@@ -28,7 +28,6 @@ class _AccesoGpsPageState extends State<AccesoGpsPage>
         Navigator.pushReplacementNamed(context, 'loading');
       }
     }
-    print('=====> $state');
   }
 
   @override
@@ -49,7 +48,6 @@ class _AccesoGpsPageState extends State<AccesoGpsPage>
             onPressed: () async {
               final status = await Permission.location.request();
               this.accesoGPS(status);
-              print(status);
             },
           ),
         ],
