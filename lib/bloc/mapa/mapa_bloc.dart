@@ -1,9 +1,10 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:mapas_app/helpers/helpers.dart';
 import 'package:meta/meta.dart';
 import 'package:bloc/bloc.dart';
-import 'package:flutter/material.dart' show Colors;
+import 'package:flutter/material.dart' show Colors, Offset;
 
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:mapas_app/themes/uber_map_theme.dart';
@@ -105,9 +106,58 @@ class MapaBloc extends Bloc<MapaEvent, MapaState> {
     final currentPolylines = state.polylines;
     currentPolylines['mi_ruta_destino'] = this._miRutaDestino;
 
+    // Icono inicio
+    // Marcador asset
+    // final iconInicio = await getAssetImageMarker();
+
+    // Marcador personalizado
+    final iconInicio = await getMarkerInicioIcon(event.duracion.toInt());
+
+    // Marcador NetworkImage
+    // final iconDestino = await getNetworkImageMarker();
+
+    // Marcador personalizado
+    final iconDestino =
+        await getMarkerDestinoIcon(event.nombreDestino, event.distancia);
+
+    // Marcadores
+    // Marcador inicio
+    final markerInicio = new Marker(
+        markerId: MarkerId('inicio'),
+        anchor: Offset(0.1, 0.9),
+        position: event.rutaCoordenadas[0],
+        icon: iconInicio,
+        infoWindow: InfoWindow(
+          title: 'Inicio de ruta',
+          // snippet: 'Descripción de el lugar del recorrido ejemplo'
+          snippet:
+              'Duración de recorrido: ${(event.duracion / 60).floor()} minutos',
+        ));
+    double kilometros = event.distancia / 1000;
+    kilometros = (kilometros * 100).floorToDouble();
+    kilometros = kilometros / 100;
+
+    // Marcador destino
+    final markerDestino = new Marker(
+      markerId: MarkerId('destino'),
+      anchor: Offset(0.1, 0.9),
+      position: event.rutaCoordenadas[event.rutaCoordenadas.length - 1],
+      icon: iconDestino,
+      // infoWindow: InfoWindow(
+      // title: event.nombreDestino,
+      // snippet: 'Distancia de recorrido: $kilometros km'),
+    );
+
+    final newMarkers = {...state.markers};
+    newMarkers['inicio'] = markerInicio;
+    newMarkers['destino'] = markerDestino;
+
+    Future.delayed(Duration(milliseconds: 300)).then(
+        (value) => _mapController.showMarkerInfoWindow(MarkerId('destino')));
+
     yield state.copyWith(
       polylines: currentPolylines,
-      // TODO: Marcadores
+      markers: newMarkers,
     );
   }
 }
